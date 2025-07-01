@@ -1,6 +1,7 @@
 package com.acainfo.backend_v1.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -12,11 +13,29 @@ import java.util.Set;
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Grupo {
 
+    /* ---------- PK ---------- */
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /* ---------- Propiedades ---------- */
+
+    @NotNull(message = "La fecha de inicio es obligatoria")
     private LocalDate fechaInicio;
+
+    @NotNull(message = "La fecha de fin es obligatoria")
     private LocalDate fechaFin;
+
+    /*
+     * Garantiza que la fechaFin sea posterior a fechaInicio.
+     * Se permite null al crear la entidad con el builder y
+     * posteriormente asignar valores.
+     */
+    @AssertTrue(message = "La fecha de fin debe ser posterior a la de inicio")
+    private boolean isRangoFechasValido() {
+        return fechaInicio == null || fechaFin == null || fechaFin.isAfter(fechaInicio);
+    }
+
+    /* ---------- Relaciones ---------- */
 
     /* Alumnos únicos en el grupo */
     @Builder.Default
@@ -26,7 +45,7 @@ public class Grupo {
                fetch = FetchType.LAZY)
     private Set<Inscripcion> inscripciones = new HashSet<>();
 
-    /* Materiales opcionales, también sin duplicados */
+    /* Materiales opcionales */
     @Builder.Default
     @OneToMany(mappedBy = "grupo",
                cascade = CascadeType.ALL,
@@ -34,7 +53,7 @@ public class Grupo {
                fetch = FetchType.LAZY)
     private Set<Material> materiales = new HashSet<>();
 
-    /* Plantillas de sesión (SESION) asociadas al grupo */
+    /* Sesiones (plantillas) asociadas */
     @Builder.Default
     @OneToMany(mappedBy = "grupo",
                cascade = CascadeType.ALL,
