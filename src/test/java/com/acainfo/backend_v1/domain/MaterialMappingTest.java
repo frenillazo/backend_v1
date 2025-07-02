@@ -9,7 +9,6 @@ import jakarta.validation.ConstraintViolationException;
 
 import com.acainfo.backend_v1.repository.AsignaturaRepository;
 import com.acainfo.backend_v1.repository.MaterialRepository;
-import com.acainfo.backend_v1.repository.GrupoRepository;
 
 import java.time.LocalDate;
 
@@ -20,46 +19,53 @@ class MaterialMappingTest {
 
     @Autowired private AsignaturaRepository asignaturaRepo;
     @Autowired private MaterialRepository materialRepo;
-    @Autowired private GrupoRepository grupoRepo;
 
     @Test
     @DisplayName("Guarda y recupera un material con asignatura y grupo opcional")
     void persistAndLoadMaterial() {
         // Asignatura obligatoria
-        Asignatura asig = asignaturaRepo.save(Asignatura.builder()
-                .nombre("Álgebra")
-                .carrera("Ingeniería")
+        Asignatura asig = asignaturaRepo.save(
+                Asignatura.builder()
+                .nombre("BBDD")
+                .carrera("Informática")
                 .build());
 
-        // Grupo opcional
-        Grupo g = grupoRepo.save(Grupo.builder()
-                .fechaInicio(LocalDate.of(2025, 1, 10))
-                .fechaFin(LocalDate.of(2025, 5, 30))
-                .build());
+        Grupo tarde = Grupo.builder()
+                .fechaInicio(LocalDate.of(2025, 9, 1))
+                .fechaFin(LocalDate.of(2026, 1, 31))
+                .asignatura(asig)
+                .build();
 
         Material mat = Material.builder()
                 .nombre("Tema 1")
                 .tipo("pdf")
-                .url("https://acainfo.es/alg/t1.pdf")
+                .url("https://acainfo.es/BBDD/t1.pdf")
                 .fechaExpiracion(LocalDate.now().plusMonths(6))
                 .asignatura(asig)
-                .grupo(g)
+                .grupo(tarde)
                 .build();
 
         Material guardado = materialRepo.save(mat);
         Material recuperado = materialRepo.findById(guardado.getId()).orElseThrow();
 
-        assertThat(recuperado.getAsignatura().getNombre()).isEqualTo("Álgebra");
-        assertThat(recuperado.getGrupo().getId()).isEqualTo(g.getId());
+        assertThat(recuperado.getAsignatura().getNombre()).isEqualTo("BBDD");
+        assertThat(recuperado.getGrupo().getId()).isEqualTo(tarde.getId());
     }
 
     @Test
     @DisplayName("La fecha de expiración debe ser futura")
     void pastExpirationDateNotAllowed() {
-        Asignatura asig = asignaturaRepo.save(Asignatura.builder()
-                .nombre("Programación")
+        Asignatura asig = asignaturaRepo.save(
+                Asignatura.builder()
+                .nombre("BBDD")
                 .carrera("Informática")
                 .build());
+
+        Grupo tarde = Grupo.builder()
+                .fechaInicio(LocalDate.of(2025, 9, 1))
+                .fechaFin(LocalDate.of(2026, 1, 31))
+                .asignatura(asig)
+                .build();
 
         Material mat = Material.builder()
                 .nombre("Ejemplo")
@@ -67,6 +73,7 @@ class MaterialMappingTest {
                 .url("https://acainfo.es/prog/video.mp4")
                 .fechaExpiracion(LocalDate.now().minusDays(1)) // pasada
                 .asignatura(asig)
+                .grupo(tarde)
                 .build();
 
         assertThatThrownBy(() -> materialRepo.saveAndFlush(mat))

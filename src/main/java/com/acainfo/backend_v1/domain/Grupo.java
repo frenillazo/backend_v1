@@ -37,6 +37,10 @@ public class Grupo {
 
     /* ---------- Relaciones ---------- */
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "asignatura_id", nullable = false)
+    private Asignatura asignatura;
+
     /* Alumnos únicos en el grupo */
     @Builder.Default
     @OneToMany(mappedBy = "grupo",
@@ -60,4 +64,5 @@ public class Grupo {
                orphanRemoval = true,
                fetch = FetchType.LAZY)
     private Set<Sesion> sesiones = new HashSet<>();
+
 }

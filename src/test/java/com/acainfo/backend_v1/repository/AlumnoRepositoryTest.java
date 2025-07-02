@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * <code>@Sql</code> lo encuentre vía classpath.
  */
 @DataJpaTest
-@Sql(scripts = "/dataAlumnoRepository.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "/dataRepository.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class AlumnoRepositoryTest {
 
     @Autowired

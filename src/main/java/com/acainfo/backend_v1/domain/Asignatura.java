@@ -45,4 +45,11 @@ public class Asignatura {
                orphanRemoval = true,
                fetch = FetchType.LAZY)
     private Set<Material> materiales = new HashSet<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "asignatura",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
+    private Set<Grupo> grupos = new HashSet<>();
 }

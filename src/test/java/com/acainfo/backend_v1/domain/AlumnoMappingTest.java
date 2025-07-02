@@ -8,6 +8,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 
 
 import com.acainfo.backend_v1.repository.AlumnoRepository;
+import com.acainfo.backend_v1.repository.AsignaturaRepository;
 import com.acainfo.backend_v1.repository.GrupoRepository;
 
 import java.time.LocalDate;
@@ -18,17 +19,24 @@ import static org.assertj.core.api.Assertions.*;
 class AlumnoMappingTest {
 
     @Autowired private AlumnoRepository alumnoRepo;
+    @Autowired private AsignaturaRepository asignaturaRepo;
     @Autowired private GrupoRepository grupoRepo;
 
     @Test
     @DisplayName("Guarda y recupera un alumno con su inscripción")
     void persistAndLoadAlumnoWithInscripcion() {
         // 1) Creamos y persistimos un grupo válido
-        Grupo g1 = Grupo.builder()
-                .fechaInicio(LocalDate.of(2025, 1, 1))
-                .fechaFin(LocalDate.of(2025, 6, 30))
-                .build();
-        grupoRepo.save(g1);
+        Asignatura mates = asignaturaRepo.save(
+            Asignatura.builder()
+                    .nombre("Matemáticas")
+                    .carrera("Ingeniería")
+                    .build());
+        Grupo g = Grupo.builder()
+            .fechaInicio(LocalDate.of(2025, 9, 1))
+            .fechaFin(LocalDate.of(2026, 1, 31))
+            .asignatura(mates)   // <-- FK añadida
+            .build();
+        grupoRepo.save(g);
 
         // 2) Creamos el alumno y su inscripción asociada
         Alumno al = Alumno.builder()
@@ -41,7 +49,7 @@ class AlumnoMappingTest {
         Inscripcion ins = Inscripcion.builder()
                 .fechaInscripcion(LocalDate.now())
                 .alumno(al)
-                .grupo(g1)
+                .grupo(g)
                 .build();
         al.getInscripciones().add(ins);
 
@@ -53,7 +61,7 @@ class AlumnoMappingTest {
         assertThat(recuperado.getNombre()).isEqualTo("Carlos");
         assertThat(recuperado.getInscripciones()).hasSize(1);
         Inscripcion recuperada = recuperado.getInscripciones().iterator().next();
-        assertThat(recuperada.getGrupo().getId()).isEqualTo(g1.getId());
+        assertThat(recuperada.getGrupo().getId()).isEqualTo(g.getId());
     }
 
     @Test

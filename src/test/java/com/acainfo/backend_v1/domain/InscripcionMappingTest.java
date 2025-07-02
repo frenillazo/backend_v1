@@ -11,6 +11,8 @@ import jakarta.validation.ConstraintViolationException;
 import com.acainfo.backend_v1.repository.AlumnoRepository;
 import com.acainfo.backend_v1.repository.GrupoRepository;
 import com.acainfo.backend_v1.repository.InscripcionRepository;
+import com.acainfo.backend_v1.repository.AsignaturaRepository;
+
 
 import java.time.LocalDate;
 
@@ -22,6 +24,7 @@ class InscripcionMappingTest {
     @Autowired private AlumnoRepository alumnoRepo;
     @Autowired private GrupoRepository grupoRepo;
     @Autowired private InscripcionRepository inscripcionRepo;
+    @Autowired private AsignaturaRepository asignaturaRepo;
 
     @Test
     @DisplayName("Guarda y recupera una inscripción válida")
@@ -35,11 +38,17 @@ class InscripcionMappingTest {
                 .build();
         alumnoRepo.save(al);
 
-        Grupo g = Grupo.builder()
-                .fechaInicio(LocalDate.of(2025, 3, 1))
-                .fechaFin(LocalDate.of(2025, 7, 1))
-                .build();
-        grupoRepo.save(g);
+        Asignatura fisica = asignaturaRepo.save(
+                Asignatura.builder()
+                        .nombre("Física")
+                        .carrera("Ingeniería")
+                        .build());
+
+        Grupo g = grupoRepo.save(Grupo.builder()
+                .fechaInicio(LocalDate.of(2025,2,1))
+                .fechaFin(LocalDate.of(2025,6,30))
+                .asignatura(fisica)
+                .build());
 
         Inscripcion ins = Inscripcion.builder()
                 .fechaInscripcion(LocalDate.now())
@@ -64,9 +73,16 @@ class InscripcionMappingTest {
                 .telefono("633221100")
                 .build());
 
+        Asignatura fisica = asignaturaRepo.save(
+                Asignatura.builder()
+                        .nombre("Física")
+                        .carrera("Ingeniería")
+                        .build());
+
         Grupo g = grupoRepo.save(Grupo.builder()
-                .fechaInicio(LocalDate.of(2025, 4, 1))
-                .fechaFin(LocalDate.of(2025, 6, 30))
+                .fechaInicio(LocalDate.of(2025,2,1))
+                .fechaFin(LocalDate.of(2025,6,30))
+                .asignatura(fisica)
                 .build());
 
         Inscripcion ins1 = Inscripcion.builder()
@@ -95,9 +111,16 @@ class InscripcionMappingTest {
                 .email("tomas@uni.es")
                 .telefono("677445566")
                 .build());
+        Asignatura fisica = asignaturaRepo.save(
+                Asignatura.builder()
+                        .nombre("Física")
+                        .carrera("Ingeniería")
+                        .build());
+
         Grupo g = grupoRepo.save(Grupo.builder()
-                .fechaInicio(LocalDate.of(2025, 1, 1))
-                .fechaFin(LocalDate.of(2025, 12, 31))
+                .fechaInicio(LocalDate.of(2025,2,1))
+                .fechaFin(LocalDate.of(2025,6,30))
+                .asignatura(fisica)
                 .build());
 
         Inscripcion ins = Inscripcion.builder()

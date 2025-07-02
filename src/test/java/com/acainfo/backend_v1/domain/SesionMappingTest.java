@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import jakarta.validation.ConstraintViolationException;
 
 import com.acainfo.backend_v1.repository.SesionRepository;
+import com.acainfo.backend_v1.repository.AsignaturaRepository;
 import com.acainfo.backend_v1.repository.GrupoRepository;
 
 import java.time.LocalDate;
@@ -19,15 +20,24 @@ import static org.assertj.core.api.Assertions.*;
 class SesionMappingTest {
 
     @Autowired private SesionRepository sesionRepo;
+    @Autowired private AsignaturaRepository asignaturaRepo;
     @Autowired private GrupoRepository grupoRepo;
 
     @Test
     @DisplayName("Guarda y recupera una sesión válida")
     void persistAndLoadSesion() {
-        Grupo g = grupoRepo.save(Grupo.builder()
-                .fechaInicio(LocalDate.of(2025, 2, 1))
-                .fechaFin(LocalDate.of(2025, 4, 30))
-                .build());
+        Asignatura quimica = asignaturaRepo.save(
+                        Asignatura.builder()
+                        .nombre("Química")
+                        .carrera("Ciencias")
+                        .build());
+
+        Grupo g = Grupo.builder()
+                .fechaInicio(LocalDate.of(2025, 3, 1))
+                .fechaFin(LocalDate.of(2025, 7, 31))
+                .asignatura(quimica)
+                .build();
+        grupoRepo.save(g);
 
         Sesion s = Sesion.builder()
                 .diaSemana("Miércoles")
@@ -46,10 +56,18 @@ class SesionMappingTest {
     @Test
     @DisplayName("Día de la semana debe cumplir el patrón")
     void invalidDayOfWeek() {
-        Grupo g = grupoRepo.save(Grupo.builder()
-                .fechaInicio(LocalDate.of(2025, 2, 1))
-                .fechaFin(LocalDate.of(2025, 4, 30))
-                .build());
+        Asignatura quimica = asignaturaRepo.save(
+                        Asignatura.builder()
+                        .nombre("Química")
+                        .carrera("Ciencias")
+                        .build());
+
+        Grupo g = Grupo.builder()
+                .fechaInicio(LocalDate.of(2025, 3, 1))
+                .fechaFin(LocalDate.of(2025, 7, 31))
+                .asignatura(quimica)
+                .build();
+        grupoRepo.save(g);
 
         Sesion s = Sesion.builder()
                 .diaSemana("Funday") // inválido
@@ -65,10 +83,18 @@ class SesionMappingTest {
     @Test
     @DisplayName("La duración debe ser positiva")
     void negativeDurationNotAllowed() {
-        Grupo g = grupoRepo.save(Grupo.builder()
-                .fechaInicio(LocalDate.of(2025, 2, 1))
-                .fechaFin(LocalDate.of(2025, 4, 30))
-                .build());
+        Asignatura quimica = asignaturaRepo.save(
+                        Asignatura.builder()
+                        .nombre("Química")
+                        .carrera("Ciencias")
+                        .build());
+
+        Grupo g = Grupo.builder()
+                .fechaInicio(LocalDate.of(2025, 3, 1))
+                .fechaFin(LocalDate.of(2025, 7, 31))
+                .asignatura(quimica)
+                .build();
+        grupoRepo.save(g);
 
         Sesion s = Sesion.builder()
                 .diaSemana("Jueves")
